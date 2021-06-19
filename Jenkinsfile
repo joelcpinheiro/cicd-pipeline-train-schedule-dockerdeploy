@@ -22,7 +22,23 @@ pipeline {
             }
         }
         
-        stage ('DeployToProduction') {
+          
+        
+        stage('Push Docker Image') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        
+             stage ('DeployToProduction') {
     when {
         branch 'master'
     }
@@ -43,22 +59,13 @@ pipeline {
         }
     }
 }
+    
         
         
         
-        stage('Push Docker Image') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
-            }
-        }
+        
+        
+        
     }   
 }
 
